@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/public/static/admino/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/static/element/multileve.css">
+</head>
+<body>
+<div class="main" id="app">
+    <div class="main-title">
+        <P>{{title}}</P>
+    </div>
+    <div class="main-body">
+        <form action="" id="formSubmit" method="post" @submit.prevent="submit">
+            <input type="hidden" :name="field" :value="ids" v-if="ids!=''">
+            <template v-for="(item,index) in header">
+                <div class="form-group row">
+                    <label class="col-sm-2 offset-sm-1 col-form-label">
+                        <template v-if="item.label==null">
+                            {{item}}
+                        </template>
+                        <template v-else>
+                            {{item.label}}
+                        </template>
+                    </label>
+                    <div class="col-sm-8">
+                        <template v-if="data!=''">
+
+                            <template v-if="item.type='TYPE_TEXT'">
+                                <input type="text" :placeholder="item.placeholder"
+                                       class="form-control"
+                                       :name="index" :value="data[index]">
+                            </template>
+                        </template>
+
+                        <template v-else>
+                            <template v-if="item.type='TYPE_TEXT'">
+                                <input type="text" :placeholder="item.placeholder"
+                                       class="form-control"
+                                       :name="index">
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <div class="submit-group">
+                <input type="submit" value="提交" class="btn btn-dark">
+                <input type="button" value="后退" @click="back" class="btn btn-light">
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/public/static/admino/js/jquery-3.2.1.min.js"></script>
+<script src="/public/static/admino/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.3.4/vue.js"></script>
+<script>
+    var data = {
+        data: '',
+        title: '',
+        header: '',
+        id: '',
+        ids: '',
+        field: ''
+    };
+    var vue = new Vue({
+        el: "#app",
+        data: data,
+        methods: {
+            back: function () {
+                window.history.back()
+            },
+            submit: function () {
+                var data = $('#formSubmit').serializeArray();
+                if (vue.ids != '') {
+                    $.post(location.pathname, data, function (res) {
+                        if (res.code == false) {
+                            alert(res.msg);
+                        }
+                    });
+                }
+                else {
+                    $.post(location.href, data, function (res) {
+                        if (res.code == false) {
+                            alert(res.msg);
+                        }
+                    });
+                }
+                window.history.back()
+            }
+        }
+    });
+    loadData();
+
+    function getUrlMethod() {
+        var url = location.search;
+        if (url.length <= 0) {
+            return '';
+        }
+        var method = url.split("?");
+        var str = method[1];
+        var arr = str.split("=");
+        return arr;
+    }
+
+    function loadData() {
+        // vue.loading = true;
+        var url = location.pathname;
+        var arr = getUrlMethod();
+        url = url.split(".");
+        if (url[url.length - 1] === "html") {
+            url[url.length - 1] = "json";
+        } else {
+            url.push("json")
+        }
+        url = url.join(".");
+        if (arr[0] == 'id') {
+            vue.id = arr[1];
+            url += ('?id=' + vue.id);
+        }
+        else if (arr[0] == 'ids') {
+            vue.ids = arr[1];
+        }
+        $.ajax(url, {
+            dataType: "json",
+            contentType: "json",
+            success: function (data) {
+                vue.field = data.data.field;
+                // vue.primary_key = data.data.primary_key;
+                vue.header = data.data.header;
+                // vue.data_option = data.data.data_option;
+                // if (!vue.data_option) {
+                //     vue.data_option = {};
+                // }
+                if (data.data.data == '') {
+                    var new_data = {};
+                    for (var i in data.data.header) {
+                        new_data[i] = "";
+                    }
+
+                    vue.data = new_data;
+                    vue.title = data.data.title + " 添加";
+                } else {
+                    vue.data = data.data.data;
+                    vue.title = data.data.title + " 编辑";
+                }
+
+                // vue.loading = false;
+                // vue.$nextTick(function () {
+                //     for (var id in vue.data_option) {
+                //         if (vue.data_option[id].type === "TYPE_TEXTAREA") {
+                //             (function (id) {
+                //                 var E = window.wangEditor;
+                //                 var editor = new E('#' + id);
+                //                 editor.customConfig.menus = [
+                //                     'head',  // 标题
+                //                     'bold',  // 粗体
+                //                     'italic',  // 斜体
+                //                     'underline',  // 下划线
+                //                     'strikeThrough',  // 删除线
+                //                     'foreColor',  // 文字颜色
+                //                     'link',  // 插入链接
+                //                     'list',  // 列表
+                //                     'justify',  // 对齐方式
+                //                     'quote',  // 引用
+                //                     'emoticon',  // 表情
+                //                     'image',  // 插入图片
+                //                     'table',  // 表格
+                //                     'video',  // 插入视频
+                //                     'code',  // 插入代码
+                //                     'undo',  // 撤销
+                //                     'redo'  // 重复
+                //                 ];
+                //                 editor.customConfig.uploadImgShowBase64 = true;
+                //                 editor.customConfig.onchange = function (html) {
+                //                     // 监控变化，同步更新到 textarea
+                //                     vue.data[id] = html;
+                //                     console.log(html);
+                //                 };
+                //                 editor.create();
+                //                 if (vue.data[id]) {
+                //                     editor.txt.html(vue.data[id]);
+                //                 } else {
+                //                     editor.txt.html("");
+                //                 }
+                //             })(id)
+                //         }
+                //     }
+                // })
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

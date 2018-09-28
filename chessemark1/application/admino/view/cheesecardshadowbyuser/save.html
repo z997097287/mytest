@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" style="zoom: 0.8">
+<head>
+    <meta charset="UTF-8">
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.3.4/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="/public/static/element/index.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcss.com/element-ui/2.3.8/index.js"></script>
+    <script src="/public/static/wangeditor/wangEditor.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="main" style="padding: 10px" v-cloak>
+    <el-card class="box-card">
+        <div slot="header" class="clearfix">
+            <span>{{title}}</span>
+        </div>
+        <el-form ref="form" label-width="150px" v-loading="loading" element-loading-text="拼命加载中">
+
+
+            <el-form-item v-for="(item, index) in header" :label="item">
+
+                <el-input v-if="index == primary_key" disabled :value="data[index]"></el-input>
+                <el-input v-else-if="!data_option[index] || !data_option[index]['type']" :disabled="is_only_read == '1'"
+                          v-model="data[index]"></el-input>
+                <el-input v-else-if="data_option[index]['type'] == 'TYPE_DISABLED_TEXT'" :value="data[index]"
+                          disabled></el-input>
+                <el-input v-else-if="data_option[index]['type'] == 'TYPE_TEXT_APPEND'" v-model="data[index]"
+                          :disabled="is_only_read == '1'"
+                          style="width: 200px;">
+                    <template v-if="data_option[index]['data'][0] && data_option[index]['data'][0]!=''"
+                              slot="prepend">
+                        {{data_option[index]['data'][0]}}
+                    </template>
+                    <template v-if="data_option[index]['data'][1] && data_option[index]['data'][1]!=''"
+                              slot="append">
+                        {{data_option[index]['data'][1]}}
+                    </template>
+                </el-input>
+                <el-input-number v-else-if="data_option[index]['type'] == 'TYPE_NUM'" :disabled="is_only_read == '1'"
+                                 v-model="data[index]"></el-input-number>
+                <div class="el-form-item__content"
+                     v-else-if="data_option[index]['type'] == 'TYPE_ORDINARY_TEXTAREA'">
+
+                <textarea
+                        :disabled="data_option[index]['data'] == '1'||is_only_read == '1'" class="el-input__inner"
+                        style="height:400px;" v-model="data[index]"></textarea>
+
+                </div>
+                <el-card v-else-if="data_option[index]['type'] == 'TYPE_TEXTAREA'">
+                    <div :id="index"></div>
+
+                    <!--<el-button v-if="!newWangEditor(index)" type="text" @click="newWangEditor(index)">编辑</el-button>-->
+                </el-card>
+
+                <el-date-picker v-else-if="data_option[index]['type'] == 'TYPE_TIME'" v-model="data[index]"
+                                :disabled="is_only_read == '1'"
+                                type="datetime" placeholder="选择日期时间" align="right">
+                </el-date-picker>
+                <el-autocomplete v-else-if="data_option[index]['type'] == 'TYPE_SELECT_INPUT'" v-model="data[index]"
+                                 :disabled="is_only_read == '1'"
+                                 class="inline-input" :fetch-suggestions="querySearch(index)"
+                                 placeholder="请输入内容"></el-autocomplete>
+                <el-select v-else-if="data_option[index]['type'] == 'TYPE_SELECT'" v-model="data[index]"
+                           :disabled="is_only_read == '1'"
+                           placeholder="请选择"
+                           filterable>
+                    <el-option v-for="(d,k) in data_option[index]['data']" :key="k" :label="d"
+                               :value="k"></el-option>
+                </el-select>
+                <el-select v-else-if="data_option[index]['type'] == 'TYPE_MULTIPLE_SELECT'" v-model="data[index]"
+                           :disabled="is_only_read == '1'"
+                           placeholder="请选择" filterable
+                           multiple>
+                    <el-option v-for="(d,k) in data_option[index]['data']" :key="k" :label="d"
+                               :value="k"></el-option>
+                </el-select>
+                <el-upload
+                        v-else-if="data_option[index]['type'] == 'TYPE_IMAGE'|| data_option[index]['type'] == 'TYPE_FILE'"
+                        :show-file-list="false" :on-success="getNodeUploadSucess(index)"
+                        action="/Api/Upload/file.json">
+                    <el-input v-model="data[index]" style="width: 300px;" :disabled="is_only_read == '1'"></el-input>
+                    <el-button type="primary" v-if="is_only_read != '1'">上传</el-button>
+
+                    <el-card v-if="data_option[index]['type'] == 'TYPE_IMAGE' && data[index] && data[index]!=''"
+                             style="margin-top:5px;width: 300px;text-align: left">
+                        <img :src="data[index]" style="max-width: 300px;">
+                    </el-card>
+                </el-upload>
+                <el-upload
+                        v-else-if="data_option[index]['type'] == 'TYPE_TX_COS'"
+                        :disabled="is_only_read == '1' || index == 'full_pic_url'"
+                        :show-file-list="false" :on-success="getNodeUploadSucess(index)"
+                        :action="'/Api/Upload/txFile.json?path='+data_option[index]['path']">
+                    <el-input v-model="data[index]" style="width: 300px;" :disabled="is_only_read == '1' || index == 'full_pic_url'"></el-input>
+                    <el-button type="primary" v-if="is_only_read != '1' && index != 'full_pic_url'">上传</el-button>
+
+                    <el-card v-if="data_option[index]['type'] == 'TYPE_TX_COS' && data[index] && data[index]!=''"
+                             style="margin-top:5px;width: 300px;text-align: left;">
+                        <img :src="data_option[index]['host']+data[index]" style="max-width: 260px;height: auto;border: 1px solid #eeeeee">
+                    </el-card>
+                </el-upload>
+
+            </el-form-item>
+            <div style="width: 100%;text-align: center" v-show="!loading">
+                <el-button type="primary" @click="onSubmit" v-if="data.full_pic_url !='' && data.full_pic_url">生成卡片</el-button>
+                <el-button @click="back">后退</el-button>
+            </div>
+        </el-form>
+
+    </el-card>
+</div>
+
+<canvas id="tmp_canvas" width="750" height="1114" style="display: none"></canvas>
+</body>
+
+<script>
+
+
+    function processingText(maxWidth, fontSize, text) {
+        var maxLength = maxWidth / fontSize;
+        var textLength = text.length;
+        var textRowArr = [];
+        var tmp = 0;
+        while (true) {
+            textRowArr.push(text.substr(tmp, maxLength))
+            tmp += maxLength
+            if (tmp >= textLength) {
+                return textRowArr
+            }
+        }
+    }
+
+    function generatePoster(cb) {
+        var c = document.getElementById("tmp_canvas");
+        var ctx = c.getContext("2d");
+        var url = '/proxy.php?u=' + encodeURIComponent(vue.data.pic_url);
+
+        var img = new Image()
+        img.src = url;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, 750, 750)
+            if (cb) {
+                cb(c)
+            }
+
+        }
+        ctx.setFillStyle = function (a) {
+            ctx.fillStyle = a;
+        };
+        ctx.setFontSize = function (a) {
+            ctx.font = "" + a + "px  sans-serif";
+        };
+        ctx.setFillStyle('#ffffff')
+        ctx.fillRect(0, 0, 750, 1114)
+
+        ctx.beginPath()
+
+        //
+        //
+        //    //文字
+        var textArry = processingText(510, 22, vue.data["text"]).reverse();
+        ;
+        var drawTextY = 1070;
+        for (var i = 0; i < textArry.length; i++) {
+            ctx.beginPath();
+            ctx.setFillStyle('#353535');
+            ctx.font = "22px sans-serif";
+            ctx.fillText(textArry[i], 38, drawTextY)
+            drawTextY -= 34
+        }
+        //时间
+        //日
+        ctx.beginPath()
+        ctx.setFillStyle('#888888')
+        ctx.setFontSize(60)
+        ctx.fillText((new Date).getDate(), 600, 1040)
+
+        //年 月
+        ctx.beginPath()
+        ctx.setFillStyle('#888888')
+        ctx.setFontSize(20)
+        ctx.fillText('' + (new Date).toString().split(" ")[1] + ' ' + (new Date).getFullYear() + '', 594, 1070)
+
+    }
+
+
+    var init_run_list = [];
+    var vue = new Vue({
+        el: '#main',
+        data: function () {
+            return {
+                is_only_read: 0,
+                title: '',
+                primary_key: '',
+                loading: true,
+                header: {},
+                data_option: '',
+                data: {},
+                defaultProps: {
+                    label: 'name',
+                    children: 'item'
+                },
+                tree_selecting: {name: "根", init: true}
+            }
+        },
+        methods: {
+            onSubmit: function () {
+                $.post(location.href, JSON.parse(JSON.stringify(vue.data)), function (res) {
+                    if (res.code == false) {
+                        alert(res.msg);
+                    }
+                    window.history.back()
+                });
+
+            },
+            generatePoster: function () {
+                generatePoster(function (canvas) {
+
+                    var imageData = canvas.toDataURL('image/jpg');
+                    var data = imageData.substr(22);
+
+                    $.post('/Api/Upload/txFileByBase64.json', {
+                        'path': "user-card",
+                        'data': data,
+                    }, function (res) {
+                        vue.data.full_pic_url = res.data
+                       console.log(res);
+                    });
+
+                });
+            },
+            back: function () {
+                window.history.back()
+            },
+            treeNodeClick: function (e) {
+                vue.tree_selecting = e;
+                console.log(e)
+            },
+            getNodeUploadSucess: function (e, path) {
+                return (function (res, file) {
+                    if(e == "pic_url"){
+                        var arr_tmp = file.name.split(".");
+                        var ext = arr_tmp.pop()
+                        if(ext !== 'jpg'){
+                            alert("上传图片格式仅支持jpg");
+                            return;
+                        }
+                        vue.data.text = arr_tmp.join(".");
+                    }
+                    console.log(file)
+                    if (res['code'] == "0") {
+                        // e = URL.createObjectURL(file.raw)
+                        vue.data[e] = res['data'];
+
+                        generatePoster(function (canvas) {
+
+                            var imageData = canvas.toDataURL('image/jpg');
+                            var data = imageData.substr(22);
+
+                            $.post('/Api/Upload/txFileByBase64.json', {
+                                'path': "user-card",
+                                'data': data,
+                            }, function (res) {
+                                vue.data.full_pic_url = res.data
+
+                            });
+
+                        });
+                    } else {
+                        alert(res['data']);
+                    }
+                });
+            },
+            newWangEditor: function (id) {
+
+                return true;
+            },
+            querySearch: function (index) {
+                return function (queryString, cb) {
+                    var tmp = [];
+                    for (var i in vue.data_option[index].data) {
+                        tmp.push({value: vue.data_option[index].data[i]});
+                    }
+                    console.log(tmp);
+                    cb(tmp);
+                };
+            },
+        },
+    });
+
+    function loadData() {
+
+        vue.loading = true;
+        var url = location.pathname;
+        url = url.split(".");
+        if (url[url.length - 1] === "html") {
+            url[url.length - 1] = "json";
+        } else {
+            url.push("json")
+        }
+        url = url.join(".");
+        url = url + location.search;
+        $.ajax(url, {
+            dataType: "json",
+            contentType: "json",
+            success: function (data) {
+                vue.primary_key = data.data.primary_key;
+                vue.header = data.data.header;
+                for (var i in data.data.data_option) {
+                    if (data.data.data_option[i]["data"]) {
+                        var new_data = {};
+                        for (var k in data.data.data_option[i]["data"]) {
+                            new_data[k + ""] = data.data.data_option[i]["data"][k];
+                        }
+                        data.data.data_option[i]["data"] = new_data;
+                    }
+                }
+                vue.data_option = data.data.data_option;
+                vue.is_only_read = data.data.is_only_read;
+                if (!vue.data_option) {
+                    vue.data_option = {};
+                }
+
+                if (data.data.data.length === 0) {
+                    var new_data = {};
+                    for (var i in data.data.header) {
+                        new_data[i] = "";
+                    }
+
+                    vue.data = new_data;
+                    vue.title = data.data.title + " 添加";
+                } else {
+                    for (var i in data.data.header) {
+                        if (typeof(data.data.data[i]) === "undefined") {
+                            data.data.data[i] = "";
+                        }
+                        data.data.data[i] = data.data.data[i] + "";
+                    }
+                    vue.data = data.data.data;
+                    vue.title = data.data.title + " 编辑";
+                }
+
+                vue.loading = false;
+                vue.$nextTick(function () {
+                    for (var id in vue.data_option) {
+                        if (vue.data_option[id].type === "TYPE_TEXTAREA") {
+                            (function (id) {
+                                var E = window.wangEditor;
+                                var editor = new E('#' + id);
+                                editor.customConfig.menus = [
+                                    'head',  // 标题
+                                    'bold',  // 粗体
+                                    'italic',  // 斜体
+                                    'underline',  // 下划线
+                                    'strikeThrough',  // 删除线
+                                    'foreColor',  // 文字颜色
+                                    'link',  // 插入链接
+                                    'list',  // 列表
+                                    'justify',  // 对齐方式
+                                    'quote',  // 引用
+                                    'emoticon',  // 表情
+                                    'image',  // 插入图片
+                                    'table',  // 表格
+                                    'video',  // 插入视频
+                                    'code',  // 插入代码
+                                    'undo',  // 撤销
+                                    'redo'  // 重复
+                                ];
+                                editor.customConfig.uploadImgShowBase64 = true;
+                                editor.customConfig.onchange = function (html) {
+                                    // 监控变化，同步更新到 textarea
+                                    vue.data[id] = html;
+                                    console.log(html);
+                                };
+                                editor.create();
+                                if (vue.data[id]) {
+                                    editor.txt.html(vue.data[id]);
+                                } else {
+                                    editor.txt.html("");
+                                }
+                            })(id)
+                        }
+                    }
+                })
+            }
+        });
+    }
+
+    loadData();
+</script>
+</html>

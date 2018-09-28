@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html style="    background: #ffffff;">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{$system['admin_title']}</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="/public/static/admino/dist/css/adminlte.min.css">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/iCheck/flat/blue.css">
+    <!-- Morris chart -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/morris/morris.css">
+    <!-- jvectormap -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/jvectormap/jquery-jvectormap-1.2.2.css">
+    <!-- Date Picker -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/datepicker/datepicker3.css">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/daterangepicker/daterangepicker-bs3.css">
+    <!-- bootstrap wysihtml5 - text editor -->
+    <link rel="stylesheet" href="/public/static/admino/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+
+</head>
+<body class="sidebar-mini" style="height: auto;">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand bg-white navbar-light border-bottom">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <aside class="main-sidebar sidebar-dark-primary elevation-4" style="min-height: 747px;">
+        <!-- Brand Logo -->
+        <a href="/admino/" class="brand-link" style="text-align: center;">
+
+            <span class="brand-text font-weight-light">{$system['admin_title']}</span>
+        </a>
+
+
+        <div class="sidebar">
+
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                    data-accordion="false">
+                    <li class="nav-item has-treeview">
+                        <a href="#/admino/index/welcome.html" class="nav-link active">
+                            <i class="nav-icon fa fa-home"></i>
+                            <p>主页</p>
+                        </a>
+                    </li>
+                    {volist name="json" id="vo"}
+                    <li class="nav-item has-treeview">
+                        <a href="{if condition='isset($vo.href)'}
+                        {$vo.href}
+                        {else /}
+                        javascript:void(0)
+                        {/if}" class="nav-link">
+                            <i class="nav-icon fa {$vo.icon}"></i>
+                            <p>
+                                {$vo.title}
+                                {if condition="isset($vo.item)"}
+                                <i class="right fa fa-angle-left"></i>
+                                {/if}
+                            </p>
+                        </a>
+                        {if condition="isset($vo.item)"}
+                        <ul class="nav nav-treeview">
+                            {volist name="$vo.item" id="data"}
+                            <li class="nav-item">
+                                <a href="{$data.href}" class="nav-link">
+                                    &nbsp;&nbsp;&nbsp;<i class="fa {if condition='isset($data.icon)'}
+                        {$data.icon}
+                        {/if} nav-icon"></i>
+                                    <p>{$data.title}</p>
+                                </a>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/if}
+                    </li>
+                    {/volist}
+                    <li class="nav-item has-treeview">
+                        <a href="/admino/index/loginout" class="nav-link">
+                            <i class="nav-icon fa fa-power-off"></i>
+                            <p>
+                                退出登录
+                            </p>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+
+
+    </aside>
+    <div class="content-wrapper" style="background: #ffffff;">

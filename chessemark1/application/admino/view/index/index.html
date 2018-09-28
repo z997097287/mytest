@@ -1,0 +1,33 @@
+{include file='public/header'/}
+
+
+<iframe id="cms_main" src="" frameborder="0" style=" width: 100%;"></iframe>
+<script>
+
+
+    window.onhashchange = function () {
+        var url = location.hash.split("#");
+        url.shift();
+
+        document.getElementById("cms_main").src = url.join("#");
+    };
+    window.onhashchange();
+    window.onresize = function () {
+        document.getElementsByClassName("content-wrapper")[0].style["min-height"] = document.getElementById("cms_main").style.height = window.innerHeight - 73 + "px";
+    }
+    setInterval(function () {
+        document.getElementsByClassName("content-wrapper")[0].style["min-height"] = document.getElementById("cms_main").style.height = window.innerHeight - 73 + "px"
+        var url = document.getElementById("cms_main").contentWindow.location.pathname + document.getElementById("cms_main").contentWindow.location.search;
+        if(location.hash != "#"+url){
+           
+          history.replaceState("", "", "/Admino/Index#" + url);
+          if (url.indexOf("/Admino/Login/index") >= 0) {
+              location.href = "/Admino/Login/index";
+          }
+        }
+    }, 500);
+</script>
+
+
+{include file='public/footer'/}
+

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/public/static/admino/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/static/admino/FontIcon/css/font-awesome.min.css">
+
+    <title>后台登录</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            /*background: #505050 url("/public/static/admino/image/background.jpg") fixed top;*/
+            background: #666666 fixed top;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .backmeng {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: #000;
+            opacity: .5;
+            z-index: -1;
+        }
+
+        .logo {
+            text-align: center;
+            margin-top: 45px;
+        }
+
+        .main {
+            position: absolute;
+            top: 135px;
+            left: 50%;
+            margin-left: -200px;
+            width: 400px;
+            height: 327px;
+            background-color: white;
+            border-radius: 5px 5px;
+            overflow: hidden;
+            opacity: 1;
+            transition: .5s ease-out opacity;
+            -moz-transition: .5s ease-out opacity;
+            -o-transition: .5s ease-out opacity;
+        }
+
+        .main-title h4 {
+            text-align: center;
+            line-height: 4.5em;
+        }
+
+        .main-content {
+            padding: 0 10% 0 10%;
+        }
+
+        .verify-input {
+            width: 65%;
+            float: left;
+        }
+
+        .verify {
+            width: 30%;
+            float: right;
+        }
+
+        .verify img {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .main-footer {
+            height: 70px;
+            background-color: #e2e2e2;
+            padding: 0 20px 0 20px;
+        }
+
+        .goback {
+            line-height: 70px;
+            font-size: 14px;
+            float: left;
+            text-decoration-color: #333;
+        }
+
+        .button {
+            float: right;
+            line-height: 70px;
+        }
+
+        .button button {
+            font-size: 14px;
+        }
+
+        .main-content-p {
+            font-size: .9em;
+            text-align: center;
+            margin: 20px 0 0 0;
+            line-height: 2em;
+        }
+
+        #email {
+            padding-bottom: 10px;
+        }
+
+        .hidden {
+            z-index: -99;
+            opacity: 0;
+        }
+
+        @media (max-width: 415px) {
+            .main {
+                width: 90%;
+                left: 5%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="backmeng"></div>
+<div class="logo">
+    <!--<img src="/public/static/admino/image/logo.png">-->
+</div>
+<!--登录窗口-->
+<div class="main" id="login">
+    <div class="main-title"><h4> 芝士记后台管理系统</h4></div>
+    <form action="/Admino/Login/login" method="post">
+        <div class="main-content">
+            <div class="input-group input-group-sm mb-3">
+                <input type="text" placeholder="请输入用户名" name="username" class="form-control">
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <input type="password" placeholder="请输入密码" name="password" class="form-control">
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <select name="type" class="form-control">
+                    <option value="NONE">管理员</option>
+                    <option value="SHADOW">影子账户</option>
+                </select>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="main-footer">
+            <a href="javascript:void(0)" class="goback">忘记密码？</a>
+            <div class="button">
+                <button id="submit" class="btn btn-primary">登录</button>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </form>
+</div>
+<!--忘记密码窗口-->
+<div class="main hidden" id="forget">
+    <div class="main-title"><h4>欧轩网络-找回密码</h4></div>
+    <form action="">
+        <div class="main-content">
+            <p class="main-content-p">请在下面的输入框输入您账号绑定的邮箱，我们将发送验证信息至您的邮箱帮助您恢复密码。</p>
+            <div class="input-group input-group-sm mb-3" id="email">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="icon-envelope-alt"></i></span>
+                </div>
+                <input type="email" placeholder="email" name="email" class="form-control">
+            </div>
+        </div>
+        <div class="main-footer">
+            <a href="javascript:void(0)" class="goback">返回登录</a>
+            <div class="button">
+                <button id="send" class="btn btn-primary">发送</button>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </form>
+</div>
+
+<script src="/public/static/admino/js/jquery-3.2.1.min.js"></script>
+<script src="/public/static/admino/js/bootstrap.min.js"></script>
+<script>
+    $(function () {
+        $('.goback').on('click', function () {
+            $('.main').toggleClass('hidden');
+        })
+    })
+</script>
+</body>
+</html>
+

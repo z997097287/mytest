@@ -1,0 +1,122 @@
+body {
+    padding: 15px;
+    font-family: '幼圆';
+}
+
+.main {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+    overflow: hidden;
+}
+
+.main-title {
+    font-size: .8em;
+    border-bottom: 1px solid #ebeef5;
+    height: 60px;
+    line-height: 60px;
+    text-indent: 1em;
+}
+
+.main-add {
+    height: 80px;
+    line-height: 80px;
+    text-align: right;
+}
+.submit-group {
+    text-align: center;
+}
+.btn-dark {
+    font-size: .9em;
+}
+
+.btn-light {
+    font-size: .9em;
+    border: 1px solid #ebeef5;
+}
+
+.main-table,
+.modal-body {
+    position: relative;
+    overflow-x: auto;
+}
+
+.table {
+    min-width: 800px;
+}
+
+.modal-body table {
+    min-width: 600px;
+}
+
+.table-bordered td,
+.table-bordered th {
+    font-size: .8em;
+}
+
+.table-bordered th {
+    color: #909399;
+    text-align: center !important;
+}
+
+.input-groups {
+    text-align: center;
+}
+
+.input-groups button {
+    background-color: white;
+    border-radius: 2px;
+    border: 1px solid #ebeef5;
+    padding: 5px 10px;
+
+}
+
+.form-group {
+    min-width: 250px;
+}
+
+.form-group input {
+    min-width: 150px;
+}
+
+.input-groups button:hover {
+    cursor: pointer;
+    background-color: #ebeef5;
+}
+
+.main-table tr {
+    text-align: center;
+}
+
+.main-body {
+    padding: 20px;
+}
+
+.main-body label {
+    font-size: .8rem;
+    text-align: right;
+}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    font-size: .8rem;
+}
+
+input:-moz-placeholder, textarea:-moz-placeholder {
+    font-size: .8rem;
+}
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+    font-size: .8rem;
+}
+
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+    font-size: .8rem;
+}
+
+@media (max-width: 992px) {
+    .main-body label {
+        text-align: left;
+    }
+}

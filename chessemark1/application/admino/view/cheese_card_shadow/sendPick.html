@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.3.4/vue.js"></script>
+    <!-- 引入样式 -->
+    <link href="/public/static/element/index.css" rel="stylesheet">
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcss.com/element-ui/2.3.8/index.js"></script>
+    <script src="/public/static/wangeditor/wangEditor.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="main" style="padding: 10px" v-cloak>
+    <div style="text-align: center">
+
+        <el-card style="width: 290px;display: inline-block;margin-right: 100px;">
+            <div slot="header" class="clearfix">
+                <span>发起者</span>
+            </div>
+            <img src="http://cheese-res-1257281477.cos.ap-shanghai.myqcloud.com{$data.left_cheese_card.full_pic_url}"
+                 alt="" style="width: 250px;">
+        </el-card>
+        <el-card style="width: 290px;display: inline-block;">
+            <div slot="header" class="clearfix">
+                <span>接受者</span>
+            </div>
+
+            <img v-if="select_pick"
+                 :src="'http://cheese-res-1257281477.cos.ap-shanghai.myqcloud.com'+select_pick.full_pic_url"
+                 @click="selectCard"
+                 alt="" style="width: 250px;">
+            <el-button v-if="!select_pick" type="text" @click="selectCard">选择卡片</el-button>
+
+        </el-card>
+        <br>
+        <br>
+        <el-button  @click="start">开始PICK</el-button>
+    </div>
+
+
+    <el-dialog :visible.sync="show_card" width="80%" fullscreen="true" close="closeExtFun">
+        <iframe src="/Admino/CheeseCardShadow/selectPickList" style="border:0;width: 100%;height: 850px;"></iframe>
+    </el-dialog>
+
+</div>
+<script>
+    var left_cheese_card_id = "{$data.left_cheese_card.id}";
+    var left_cheese_card_user_id = "{$data.left_cheese_card.user_id}";
+    var vue = new Vue({
+        el: '#main',
+        data: function () {
+            return {
+                left_cheese_card_pic: "",
+                show_card: false,
+                select_pick: false,
+            }
+        },
+        methods: {
+            selectCard: function () {
+                vue.show_card = true;
+            },
+            start: function () {
+                $.post("/Api/PickGroup/pickByPickGroupId.json", {
+                    left_cheese_card_id: left_cheese_card_id,
+                    right_cheese_card_id: vue.select_pick.id,
+                    debug: left_cheese_card_user_id,
+                }, function (data) {
+                    if(data.code === '0'){
+                        alert("操作完成")
+                        location.href = "/Admino/CheeseCardShadow/index.html";
+                    }
+                    alert(data.msg)
+                });
+
+            }
+        }
+    });
+    setInterval(function () {
+        vue.select_pick = JSON.parse(localStorage.select_pick)
+    }, 300);
+    localStorage.select_pick = false;
+</script>
+</body>
+</html>

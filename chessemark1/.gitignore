@@ -1,0 +1,6 @@
+.idea
+composer.lock
+*.log
+runtime
+sql_config.php
+.ThinkPHP

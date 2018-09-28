@@ -1,0 +1,155 @@
+[
+  {
+    "title": "用户管理",
+    "icon": "fa-user",
+    "href": "#/Admino/UserExt/index.html"
+  },
+  {
+    "title": "影子账户管理",
+    "icon": "fa-group",
+    "item": [
+      {
+        "title": "影子分组设置",
+        "icon": "fa-group",
+        "href": "#/Admino/UserShadowGroup/index.html"
+      },
+      {
+        "title": "影子账户列表",
+        "icon": "fa-bars",
+        "href": "#/Admino/UserShadow/index.html"
+      }
+    ]
+  },
+  {
+    "title": "chesse卡兑换商城",
+    "icon": "fa-gift",
+    "item": [
+      {
+        "title": "产品列表",
+        "icon": "fa-bars",
+        "href": "#/Admino/Product/index.html"
+      },
+      {
+        "title": "订单列表",
+        "icon": "fa-bars",
+        "href": "#/Admino/Order/index.html"
+      }
+    ]
+  },
+  {
+    "title": "卡片模块",
+    "icon": "fa-folder-open-o",
+    "item": [
+      {
+        "title": "普通用户卡片管理",
+        "icon": "fa-folder-open-o",
+        "href": "#/Admino/CheeseCard/index.html"
+      },
+      {
+        "title": "影子用户卡片管理",
+        "icon": "fa-folder-open-o",
+        "href": "#/Admino/CheeseCardShadow/index.html"
+      },
+      {
+        "title": "卡片池管理",
+        "icon": "fa-folder-open-o",
+        "href": "#/Admino/CheeseCardPool/index.html"
+      },
+      {
+        "title": "涉黄可疑卡片管理",
+        "icon": "fa-folder-open-o",
+        "href": "#/Admino/CheeseCardBad/index.html"
+      },
+      {
+        "title": "卡片审核",
+        "icon": "fa-folder-open-o",
+        "href": "#/Admino/CheeseCardShadowReview/index.html"
+      }
+    ]
+  },
+  {
+    "title": "评论管理",
+    "icon": "fa-comments",
+    "item": [
+      {
+        "title": "cheese卡评论管理",
+        "icon": "fa-comment",
+        "href": "#/Admino/CheeseCardComment/index.html"
+      },
+      {
+        "title": "pick组评论管理",
+        "icon": "fa-comment",
+        "href": "#/Admino/PickGroupComment/index.html"
+      }
+    ]
+  },
+  {
+    "title": "Pick组管理",
+    "icon": "fa-send",
+    "item": [
+      {
+        "title": "用户pick组管理",
+        "icon": "fa-send",
+        "href": "#/Admino/PickGroupByUser/index.html"
+      },
+      {
+        "title": "影子用户pick组管理",
+        "icon": "fa-send",
+        "href": "#/Admino/PickGroupShadow/index.html"
+      }
+    ]
+  },
+  {
+    "title": "业务设置",
+    "icon": "fa-gear",
+    "item": [
+      {
+        "title": "芝士圈banner设置",
+        "icon": "fa-picture-o",
+        "href": "#/Admino/Banner/index.html"
+      },
+      {
+        "title": "启动页设置",
+        "icon": "fa-cog",
+        "href": "#/Admino/SystemStartPicture/save.html?id=18"
+      }
+    ]
+  },
+  {
+    "title": "其它",
+    "icon": "fa-toggle-down",
+    "item": [
+      {
+        "title": "系统消息",
+        "icon": "fa-envelope",
+        "href": "#/Admino/Banner/index.html"
+      },
+      {
+        "title": "用户反馈",
+        "icon": "fa-commenting",
+        "href": "#/Admino/Feedback/index.html"
+      }
+    ]
+  },
+  {
+    "title": "举报管理",
+    "icon": "fa-hand-paper-o",
+    "item": [
+      {
+        "title": "用户",
+        "icon": "fa-male",
+        "href": "#/Admino/ReportUser/index.html"
+      },
+      {
+        "title": "卡片",
+        "icon": "fa-folder",
+        "href": "#/Admino/ReportCard/index.html"
+      }
+    ]
+  },
+  {
+    "title": "系统设置",
+    "icon": "fa-gear",
+    "href": "#/Admino/System/index.html"
+  }
+]

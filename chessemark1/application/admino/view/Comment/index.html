@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>Pick组评论管理</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+
+<body style="zoom: 0.8;padding: 45px;
+">
+<div id="app">
+<template>
+    <el-table
+            :data="tableData"
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="user_id"
+                label="用户id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="pick_id"
+                label="pick组id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="content"
+                label="评论内容"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="star"
+                label="点赞数量"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                label="操作"
+                width="180">
+        <template slot-scope="scope">
+            <el-button  type="text"@click="dialogFormVisible = true" size="small">编辑</el-button>
+            <el-button @click="handleClick(scope.row.id)" type="text" size="small">删除</el-button>
+        </template>
+    </el-table>
+    <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+        <el-form :model="form">
+            <el-form-item label="评论内容" :label-width="formLabelWidth">
+                <el-input v-model="form.name" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="影子账号" :label-width="formLabelWidth">
+                <el-select v-model="form.region" placeholder="请选择影子账号">
+                    {volist name='row' id='q'}
+                    <el-option label="影子账号{q.id}" value="{.user_name}"></el-option>
+                    {/volist}
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        </div>
+    </el-dialog>
+</template>
+</div>
+<script>
+    var a=new Vue({
+        el:'#app',
+        data() {
+            return {
+                tableData: [
+                    {volist name="data" id="vo"}
+                    {
+                    id: '{$vo.id}',
+                    user_id: '{$vo.user_id}',
+                    pick_id: '{$vo.pick_group_id}',
+                    content:'{$vo.content}',
+                    star:'{$vo.star}'
+
+                },
+                    {/volist}],
+                    dialogTableVisible: false,
+                    dialogFormVisible: false,
+                    form: {
+                    name: '',
+                    region: '',
+                    date1: '',
+                    date2: '',
+                    delivery: false,
+                    type: [],
+                    resource: '',
+                    desc: ''
+            },
+            formLabelWidth: '120px'
+            }
+        },
+            methods: {
+                handleClick: function(row) {
+                    axios.get('https://www.cheesepick.com/Admino/Comment/delete.json?id='+row)
+                        .then(function (response) {
+                            if(data['code']==0){
+                                alert('删除成功');
+                            }
+                            if(data['code']==-1){
+                                alert(data['msg'])
+                            }
+                            console.log(data);
+                            location.reload(true);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                },
+
+                },
+    })
+
+</script>
+    <!--
+<div class="mdui-table-fluid">
+    <table class="mdui-table">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>用户id</th>
+            <th>pick组id</th>
+            <th>评论内容</th>
+            <th>点赞数量</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="data" id="vo"  }
+        <tr>
+            <td>{$vo.id}</td>
+            <td>{$vo.user_id}</td>
+            <td>{$vo.pick_group_id}</td>
+            <td>{$vo.content}</td>
+            <td>{$vo.star}</td>
+            <td><button onclick="edit({$vo.id},{$vo.pick_group_id});" class="mdui-ripple mdui-btn">评论</button><button onclick="star({$vo.id},{$vo.user_id});" class="mdui-ripple mdui-btn">点赞</button><button onclick="deletes({$vo.id});" class="mdui-ripple mdui-btn">屏蔽</button></td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+</div>
+</div>
+    <div id="dialog" style="display: none;" title="评论">
+       <form method="get" action="https://www.cheesepick.com/Admino/Comment/comment.json">
+           <input type="text">
+           <input type="submit">
+       </form>
+    </div>
+<button onclick="test()">qaq</button>-->
+<script>
+    /**function deletes($id) {
+        if(confirm("是否确认删除")){
+            $.ajax({
+                type:'get',
+                url:"https://www.cheesepick.com/Admino/Comment/delete.json",
+                data:'id='+$id,
+                dataType: "JSON",
+                async: false,
+                success:function (data) {
+                    if(data['code']==0){
+                        alert('删除成功');
+                    }
+                    if(data['code']==-1){
+                        alert(data['msg'])
+                    }
+                    console.log(data);
+                    location.reload(true);
+                }
+            });
+        } else{
+            return false;
+        }
+    }
+    function star($id,$user_id) {
+        if(confirm("是否确认点赞")){
+            $.ajax({
+                type:'get',
+                dataType: "JSON",
+                url:"https://www.cheesepick.com/Admino/Comment/star.json",
+                data:'id='+$id+"&user_id="+$user_id,
+                async: false,
+                success:function (data) {
+                    console.log(data);
+                    location.reload(true);
+                    if(data['code']==0){
+                        alert('点赞成功');
+                    }
+                    if(data['code']==-1){
+                        alert(data['msg'])
+                    }
+                }
+            });
+        } else{
+            return false;
+        }
+    }
+    function edit(id,pick_group_id) {
+        var row=prompt("请输入评论",'');
+        $.ajax({
+            type:'get',
+            dataType: "JSON",
+            url:"https://www.cheesepick.com/Admino/Comment/edit.json",
+            data:'id='+id+"&pick_group_id="+pick_group_id+"&content="+row,
+            async: false,
+            success:function (data) {
+                console.log(data);
+                location.reload(true);
+                if(data['code']==0){
+                    alert('评论成功');
+                }
+                if(data['code']==-1){
+                    alert(data['msg'])
+                }
+            }
+        });
+        console.log('我执行了');
+    }**/
+</script>
+</body>
+
+</html>

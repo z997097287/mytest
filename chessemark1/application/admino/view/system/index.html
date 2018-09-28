@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/public/static/admino/dist/css/adminlte.min.css">
+    <script src="https://cdn.bootcss.com/vue/2.5.17-beta.0/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body style="padding: 30px;">
+<div class="card" id="app">
+    <div class="card-header">
+        <h3 class="card-title">系统设置</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table class="table table-bordered">
+            <tbody id="list">
+            <tr>
+                <th>键值</th>
+                <th>值</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            <tr v-for="item in list">
+                <td>{{item.key}}</td>
+                <td>{{item.value}}</td>
+                <td>{{item.text}}</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            list: []
+        }
+    })
+    $.get("/admino/system/index.json", function (data) {
+        app.list = data.data;
+        console.log(data);
+    })
+</script>
+</html>

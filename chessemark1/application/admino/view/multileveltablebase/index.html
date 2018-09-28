@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/public/static/admino/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/static/element/multileve.css">
+</head>
+<body>
+<div class="main" id="app">
+    <div class="main-title">
+        <P>{{ title }} 列表</P>
+    </div>
+    <div class="main-add">
+        <button class="btn btn-dark" @click="add()">添加</button>
+    </div>
+    <div class="main-table">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <template v-for="list in list_header">
+                    <th>{{list}}</th>
+                </template>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template v-for="items in list_data['data']">
+                <tr>
+                    <template v-for="(item,index) in items">
+                        <td v-if="index !== 'sub_button'">
+                            {{item}}
+                        </td>
+                    </template>
+                    <td width="300">
+                        <div class="input-groups">
+                            <button :data-id="items.id" id="shows" @click="search(items.id)">查看</button>
+                            <button @click="handleEdit(items)">修改</button>
+                            <button @click="add(items.id)">添加</button>
+                            <button @click="handleDelete(items)">删除</button>
+                        </div>
+                    </td>
+
+                </tr>
+            </template>
+            <template v-if="list_data['data']==null">
+                <tr>
+                    <th colspan="20">查无数据</th>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li v-if="first_list_page<=1" class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li v-else class="page-item">
+                    <a class="page-link" @click="changePage(1)" href="javascript:void(0)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <template v-for="n in first_list_all">
+                    <li class="page-item"><a class="page-link" @click="changePage(n)"
+                                             href="javascript:void(0)">{{n}}</a></li>
+                </template>
+
+                <li v-if="first_list_page>=first_list_all" class="page-item disabled">
+                    <a class="page-link" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li v-else class="page-item">
+                    <a class="page-link" href="javascript:void(0)" @click="changePage(first_list_all)"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade " id="second" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <template v-for="list in list_header">
+                                <th>{{list}}</th>
+                            </template>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="items in list_data_second['data']">
+                            <tr>
+                                <template v-for="(item,index) in items">
+                                    <td>{{item}}</td>
+                                </template>
+                                <td width="300">
+                                    <div class="input-groups">
+                                        <button @click="handleEdit(items)">查看/修改</button>
+                                        <button @click="handleDelete(items)">删除</button>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </template>
+                        <template v-if="list_data_second['data']==''">
+                            <tr>
+                                <th colspan="20">查无数据</th>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation example" v-if="list_data_second['data']!=''">
+                        <ul class="pagination">
+                            <li v-if="second_id<=1" class="page-item disabled">
+                                <a class="page-link" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li v-else class="page-item">
+                                <a class="page-link" href="javascript:void(0)" @click="search(second_page,1)"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <template v-for="n in second_list_all">
+                                <li class="page-item"><a class="page-link" @click="search(second_page,n)"
+                                                         href="javascript:void(0)">{{n}}</a></li>
+                            </template>
+
+                            <li v-if="second_id>=second_list_all" class="page-item disabled">
+                                <a class="page-link" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li v-else class="page-item">
+                                <a class="page-link" href="javascript:void(0)"
+                                   @click="search(second_page,second_list_all)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/public/static/admino/js/jquery-3.2.1.min.js"></script>
+<script src="/public/static/admino/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.3.4/vue.js"></script>
+<script>
+    var data = {
+        title: "",
+        list_data: [],
+        list_data_second: [],
+        list_header: [],
+        list_show: [],
+        first_list_all: '',//一级菜单总页数
+        second_list_all: '',//二级菜单总页数
+        list_limit: '',//条数
+        first_list_count: '',//一级菜单总数
+        second_list_count: '',//二级菜总数
+        first_list_page: 1,//一级菜单当前的页码
+        second_list_page: 1,//二级菜单当前的页码
+        second_page: 0,//指定父级一级菜单
+        second_id: 1,//二级菜单页码
+        field: '',//字段
+        loading: false
+    }
+    var vue = new Vue({
+        el: '#app',
+        data: data,
+        methods: {
+            search: function (id, page = 1) {
+                changeSecondPage(id, page);
+            }
+            ,
+            changePage: function (page) {
+                changePage(page)
+            },
+            add: function (id = 0) {
+                if (id == 0) {
+                    location.href = "save";
+                }
+                else {
+                    location.href = "save?ids=" + id;
+                }
+
+            },
+            handleEdit: function (data) {
+                location.href = "save?id=" + data['id'];
+            },
+            handleDelete: function (data) {
+                console.log(data)
+                if (window.confirm('删除操作无法恢复,是否继续？')) {
+                    $.post("delete", {
+                        id: data['id']
+                    }, function (res) {
+                        if (res.code == false) {
+                            alert(res.msg);
+                        }
+                        location.reload();
+                    });
+                }
+
+            },
+        }
+
+    })
+    changePage(1);
+
+
+    function changeSecondPage(id, page) {
+        // vue.loading = true;
+        var url = location.pathname;
+        url = url.split(".");
+        if (url[url.length - 1] === "html") {
+            url[url.length - 1] = "json";
+        } else {
+            url.push("json")
+        }
+        url = url.join(".");
+        var data = {
+            id: id,
+            page: page
+        };
+        $.ajax(url, {
+            data: data,
+            type: "GET",
+            dataType: "json",
+            contentType: "json",
+            success: function (data) {
+                console.log(data)
+                vue.list_data_second = filter(data.data.list_data_second);
+                vue.second_id = page;
+                vue.second_list_count = vue.list_data_second.count;
+                vue.second_list_all = pagination(vue.second_list_count, vue.list_limit);
+                vue.second_page = id;
+
+                $('#second').modal();
+            }
+        });
+    }
+
+    function changePage(page) {
+        // vue.loading = true;
+        var url = location.pathname;
+        url = url.split(".");
+        if (url[url.length - 1] === "html") {
+            url[url.length - 1] = "json";
+        } else {
+            url.push("json")
+        }
+        url = url.join(".");
+
+        var data = {
+            page: page
+        };
+        $.ajax(url, {
+            data: data,
+            type: "GET",
+            dataType: "json",
+            contentType: "json",
+            success: function (data) {
+                vue.title = data.data.title;
+                // vue.search_header = data.data.search_header;
+                vue.list_header = data.data.list_header;
+                // vue.list_header_more = data.data.list_header_more;
+                // vue.list_data_option = data.data.list_data_option;
+                vue.first_list_count = parseInt(data.data.list_data.count);
+                vue.list_limit = parseInt(data.data.list_limit);
+                vue.list_data = filter(data.data.list_data);
+                // vue.loading = false;
+                vue.list_data_second = filter(data.data.list_data_second);
+                vue.first_list_all = pagination(vue.first_list_count, vue.list_limit);
+                vue.first_list_page = page;
+                vue.field = data.data.field;
+            }
+        });
+    }
+
+    function filter(data) {
+        data = JSON.parse(JSON.stringify(data));
+        return data;
+    }
+
+    function pagination(count, limit) {
+        var totalPage = Math.ceil(count / limit);
+        return totalPage;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>计划任务</title>
+    <script src="https://cdn.bootcss.com/vue/2.5.17-beta.0/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/element-ui/2.4.0/index.js"></script>
+    <link href="https://cdn.bootcss.com/element-ui/2.4.0/theme-chalk/index.css" rel="stylesheet">
+</head>
+<body>
+<div id="app" style="padding: 10px" v-cloak>
+    <div style="padding: 100px;">
+
+        <el-card>
+            <el-switch
+                    v-model="is_run"
+                    @change="runChange()"
+                    active-text="运行中"
+                    inactive-text="停止">
+            </el-switch>
+
+        </el-card>
+        <el-card style="margin-top: 30px;">
+
+            <el-table
+                    :data="tableData"
+                    style="width: 100%">
+                <el-table-column prop="Name" label="任务名" width="180"></el-table-column>
+                <el-table-column prop="Url" label="Url" width="180"></el-table-column>
+                <el-table-column prop="IntervalSec" label="访问间隔(秒)"></el-table-column>
+                <el-table-column prop="LastRunTime" label="上次运行时间(时间戳)"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-card>
+        <el-card style="margin-top: 30px;">
+            <el-form ref="form" label-width="120px">
+                <el-form-item label="任务名">
+                    <el-input v-model="form.Name"></el-input>
+                </el-form-item>
+                <el-form-item label="Url">
+                    <el-input v-model="form.Url"></el-input>
+                </el-form-item>
+                <el-form-item label="访问间隔(秒)">
+                    <el-input-number v-model="form.IntervalSec" :min="1" label="描述文字"></el-input-number>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
+    </div>
+</div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                tableData: [],
+                form: {
+                    Name: "",
+                    Url: "",
+                    IntervalSec: 0
+                },
+                is_run: false
+
+            };
+        },
+        methods: {
+            handleDelete: function (i) {
+                app.tableData.splice(i, 1);
+                sync();
+            },
+            onSubmit: function () {
+                app.tableData.push(JSON.parse(JSON.stringify(app.form)));
+                app.form = {
+                    Name: "",
+                    Url: "",
+                    IntervalSec: ""
+                };
+                sync();
+
+                console.log(app.form);
+            },
+            runChange: function () {
+                if (!app.is_run) {
+                    $.get("/Stop?token=" + localStorage["token"]);
+                } else {
+                    $.get("/Start?token=" + localStorage["token"]);
+                }
+            }
+        }
+    });
+
+    function sync() {
+        $.ajax({
+            type: "post",
+            url: '/SetTask?token=' + localStorage["token"],
+            data: JSON.stringify(app.tableData),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+            } // 注意不要在此行增加逗号
+        });
+    }
+
+    setInterval(function () {
+
+        $.get("/Task?token=" + localStorage["token"], function (data) {
+            console.log(data);
+            if (data.Code == 102) {
+                location.href = "/html/auth.html";
+            }
+            app.tableData = JSON.parse(data['Task']);
+            app.is_run = data["IsRun"] === "true"
+
+        });
+    }, 1000);
+</script>
+</html>

@@ -1,0 +1,69 @@
+body {
+    -webkit-transition: .3s ease-out margin-left;
+    -moz-transition: .3s ease-out margin-left;
+    -ms-transition: .3s ease-out margin-left;
+    -o-transition: .3s ease-out margin-left;
+    transition: .3s ease-out margin-left;
+    margin-left: 0;
+    width: 100vw;
+    overflow-x: hidden;
+}
+.icon-list {
+    color: #fff;
+}
+.remove {
+    margin-left: 250px !important;
+}
+.aside-move {
+    left: 0 !important;
+}
+.meng-move {
+    display: block !important;
+}
+.backmeng {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    opacity: .2;
+    display: none;
+    margin-left: 0;
+    margin-top: 55px;
+    z-index: 998;
+}
+.aside {
+    position: fixed;
+    left:-250px;
+    top: 0;
+    background-color: #000;
+    color: #fff;
+    width:250px;
+    height: 100vh;
+    margin-left: 0;
+    -webkit-transition: .3s ease-out left;
+    -moz-transition: .3s ease-out left;
+    -ms-transition: .3s ease-out left;
+    -o-transition: .3s ease-out left;
+    transition: .3s ease-out left;
+    z-index: 999;
+}
+.nav-link {
+    color: #adaaaa;
+}
+.nav-link:hover {
+    color: white;
+    background-color: #333;
+}
+.nav-pills .nav-link.active {
+    background-color: #333;
+}
+.aside-title {
+    background-color: #17a2b8;
+}
+.aside-title h3 {
+    line-height: 2.5em;
+    text-align: center;
+    color: #fff;
+}

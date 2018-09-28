@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" style="zoom: 0.8">
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.ba-bbq/1.2.1/jquery.ba-bbq.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.3.4/vue.js"></script>
+    <!-- 引入样式 -->
+    <!--<link href="https://cdn.bootcss.com/element-ui/1.3.7/theme-default/index.css" rel="stylesheet">-->
+
+    <link href="/public/static/element/index.css" rel="stylesheet">
+    <!--<link href="/public/css/element.css" rel="stylesheet">-->
+    <!-- 引入组件库 -->
+    <script src="https://cdn.bootcss.com/element-ui/2.3.8/index.js"></script>
+
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="main" style="padding: 10px;" v-cloak>
+
+    <el-dialog :visible.sync="ext_iframe" width="80%" fullscreen="true" close="closeExtFun">
+        <iframe :src="ext_iframe.src" style="border:0;width: 100%;height: 850px;"></iframe>
+    </el-dialog>
+
+
+    <el-card class="box-card" v-show="!loading">
+        <div slot="header" class="clearfix">
+            <span>{{title}} 列表</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="add" v-if="is_add">添加</el-button>
+        </div>
+        <div v-if="search_header.length > 0">
+            <el-input v-model="search" placeholder="请输入内容" style="width: 200px;"></el-input>
+            <el-button type="primary" @click="searchFun()">搜索</el-button>
+        </div>
+        <div v-if="filter_header.length > 0">
+
+            <span v-for="(item, index) in filter_header">
+
+                <el-input size="medium" v-if="!list_data_option[item]||list_data_option[item]['type'] != 'TYPE_SELECT'"
+                          v-model="filter[item]"
+                          style="width: 200px;margin-right: 10px;">
+                    <template slot="prepend">{{list_header[item]}}</template>
+                </el-input>
+                <span style="margin-right: 10px;" v-else-if="list_data_option[item]['type'] == 'TYPE_SELECT'">
+                    <span style="border-radius: 4px 0 0 4px ;margin-right:-7px;padding: 0 20px;height: 34px;line-height: 33px;border:1px solid #dcdfe6;text-align: center; color: #909399;  display: inline-block;  background: rgb(245, 247, 250);">{{list_header[item]}}</span>
+                    <el-select size="medium" v-model="filter_select[index]" placeholder="{{list_header[item]}}"
+                               style=" border-radius: 0 4px 4px 0;width: 150px;">
+                        <el-option v-for="item in list_data_option[item]['options']" :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value"></el-option>
+                    </el-select>
+                </span>
+
+            </span>
+
+            <el-button size="medium" type="primary" @click="filterFun()">筛选</el-button>
+            <el-button size="medium" type="primary" @click="filterReset()">重置</el-button>
+        </div>
+        <div
+                style="margin-top: 18px;">
+            <el-table style="text-align: center"
+                      :data="list_data"
+                      :fit="table_fit"
+                      element-loading-text="拼命加载中"
+                      border>
+                <el-table-column v-for="(item, index) in list_header" :prop="index" :label="item" :data-value="item"
+                                 :width="(list_data_option[index] && list_data_option[index]['table_width'])?list_data_option[index]['table_width']:(
+                             (list_data_option[index] && list_width[list_data_option[index]['type']])?list_width[list_data_option[index]['type']]:'')">
+                    <template scope="scope">
+                        <span v-if="!list_data_option[index]">{{scope.row[index]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_TEXT_APPEND'">{{list_data_option[index]['data'][0]}}{{scope.row[index]}}{{list_data_option[index]['data'][1]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_NUM'">{{scope.row[index]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_TEXTAREA'">太多放不下...</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_TIME'">{{scope.row[index]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_SELECT_INPUT'">{{scope.row[index]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_SELECT'">{{list_data_option[index]['data'][scope.row[index]]}}</span>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_MULTIPLE_SELECT'">
+                            <span v-for="item in scope.row[index]">{{list_data_option[index]['data'][item]}} </span>
+                        </span>
+                        <el-popover v-else-if="list_data_option[index]['type'] == 'TYPE_IMAGE'" trigger="hover"
+                                    placement="top">
+                            <img :src="scope.row[index]" alt="" style="max-width: 300px;max-height: 300px;">
+                            <el-button slot="reference" type="text" style="text-overflow:ellipsis;">{{scope.row[index]}}
+                            </el-button>
+                        </el-popover>
+
+                        <el-popover v-else-if="list_data_option[index]['type'] == 'TYPE_TX_COS'" trigger="click"
+                                    placement="left">
+                            <img :src="list_data_option[index]['host']+scope.row[index]" alt=""
+                                 style="max-width: 800px;max-height: 800px;">
+
+                            <el-button slot="reference" type="text" style="text-overflow:ellipsis;">
+                                <img :src="list_data_option[index]['host']+scope.row[index]" alt=""
+                                     style="max-width: 200px;max-height: 200px;border: 1px solid #888888">
+                            </el-button>
+                        </el-popover>
+                        <span v-else-if="list_data_option[index]['type'] == 'TYPE_ARRAY'">
+                            <el-tag style="margin-right: 5px;" v-for="item in scope.row[index]" size="medium"
+                                    type="info">{{item}}</el-tag>
+                        </span>
+                        <span v-else>{{scope.row[index]}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" :width="300">
+                    <template scope="scope">
+
+
+                        <el-button v-if="is_edit"
+                                   size="mini"
+                                   @click="handleEdit(scope.$index, scope.row)">查看/编辑
+                        </el-button>
+                        <el-button
+                                v-if="!is_edit"
+                                size="mini"
+                                @click="handleEdit(scope.$index, scope.row,1)">查看
+                        </el-button>
+                        <el-popover
+                                v-if="table_ext_button || table_ext_button_iframe"
+                                placement="top"
+                                trigger="click">
+
+                            <el-button v-for="(item, index) in table_ext_button" size="mini" type="primary"
+                                       @click="tableExtButton(scope.row,item,index)"> {{index}}
+                            </el-button>
+                            <el-button v-for="(item, index) in table_ext_button_iframe" size="mini" type="primary"
+                                       @click="tableExtIframeButton(scope.row,item,index)"> {{index}}
+                            </el-button>
+                            <el-button slot="reference" size="mini">更多操作</el-button>
+                        </el-popover>
+
+                        <el-button
+                                v-if="is_del"
+                                size="mini"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+
+            </el-table>
+        </div>
+
+
+        <el-pagination
+                style="margin-top: 15px;"
+                layout="prev, pager, next"
+                :page-size="list_limit"
+                @current-change="changePage"
+                :total="list_count">
+        </el-pagination>
+    </el-card>
+</div>
+</body>
+
+<script>
+    var vue = new Vue({
+        el: '#main',
+        data: function () {
+            return {
+                table_fit: true,
+                title: "",
+                ext_iframe: false,
+                is_add: false,
+                is_del: false,
+                is_edit: false,
+                search: "",
+                search_header: false,
+                filter: {},
+                filter_select: [
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                    "未选择选项",
+                ],
+                filter_header: false,
+                list_count: 0,
+                list_limit: 0,
+                list_header: [],
+                list_header_more: [],
+                list_data_option: [],
+                list_data: [],
+                loading: false,
+                list_width: {
+                    "TYPE_TEXT_APPEND": 100,
+                    "TYPE_NUM": 100,
+                    "TYPE_TIME": 100,
+                    "TYPE_SELECT_INPUT": 100,
+                    "TYPE_SELECT": 100,
+                    "TYPE_MULTIPLE_SELECT": 300,
+                    "TYPE_IMAGE": 320,
+                },
+            }
+        },
+        methods: {
+            handleExtConfirm: function (val, data) {
+                if (window.parent.extData) {
+                    window.parent.extData(data);
+                }
+            },
+            handleEdit: function (val, data, is_only_read) {
+                if (is_only_read) {
+                    location.href = "save?is_only_read=1&id=" + data['id'];
+                } else {
+                    location.href = "save?id=" + data['id'];
+                }
+            },
+            add: function () {
+
+                location.href = "save";
+            },
+            searchFun: function () {
+                changePage(1);
+            },
+            filterFun: function () {
+                var data = {};
+                if (vue.filter) {
+                    for (var i in vue.filter_header) {
+                        if (vue.filter_select[i] != '未选择选项') {
+                            vue.filter[vue.filter_header[i]] = vue.filter_select[i];
+                        }
+                    }
+                    data['filter'] = vue.filter;
+                }
+                location.href = "?" + jQuery.param(data);
+            },
+            tableExtButton: function (data, url, type) {
+                location.href = url + "?id=" + data['id'] + "&type=" + type;
+            },
+            closeExtFun: function () {
+                vue.ext_iframe = false;
+            },
+            tableExtIframeButton: function (data, url, type) {
+
+                var src = url + "?id=" + data['id'] + "&type=" + type;
+                vue.ext_iframe = {
+                    title: "",
+                    src: src
+                };
+            },
+            handleDelete: function (val, data) {
+                console.log("t");
+                if (window.confirm('删除操作无法恢复,是否继续？')) {
+                    $.post("delete", {
+                        id: data['id']
+                    }, function (res) {
+                        if (res.code == false) {
+                            alert(res.msg);
+                        }
+                        location.reload();
+                    });
+                }
+
+            },
+            changePage: function (page) {
+                changePage(page);
+            },
+            filterReset: function (page) {
+                location.href = location.pathname;
+            }
+        }
+    });
+
+    function filter(data) {
+        data = JSON.parse(JSON.stringify(data));
+        return data;
+    }
+
+    function changePage(page) {
+        vue.loading = true;
+        vue.list_data = [];
+        vue.$forceUpdate();
+        var url = location.pathname;
+        url = url.split(".");
+        if (url[url.length - 1] === "html") {
+            url[url.length - 1] = "json";
+        } else {
+            url.push("json")
+        }
+        url = url.join(".");
+
+        var data = {
+            page: page
+        };
+        if (vue.search) {
+            data['search'] = vue.search;
+        }
+        $.ajax(url + location.search, {
+            data: data,
+            type: "GET",
+            dataType: "json",
+            contentType: "json",
+            success: function (data) {
+                vue.table_ext_button_iframe = data.data.table_ext_button_iframe;
+                vue.table_ext_button = data.data.table_ext_button;
+                vue.is_edit = data.data.is_edit;
+                vue.is_del = data.data.is_del;
+                vue.is_add = data.data.is_add;
+                vue.title = data.data.title;
+                vue.search_header = data.data.search_header;
+                vue.filter_header = data.data.filter_header;
+                vue.list_header = data.data.list_header;
+                vue.list_header_more = data.data.list_header_more;
+                console.log(data.data.list_data_option);
+
+
+                for (var item in data.data.list_data_option) {
+                    if (data.data.list_data_option[item]['type'] == "TYPE_SELECT") {
+                        var options = [];
+                        for (var k in data.data.list_data_option[item]['data']) {
+                            options.push({
+                                value: k,
+                                label: data.data.list_data_option[item]['data'][k]
+                            });
+                        }
+                        data.data.list_data_option[item]["options"] = options;
+                    }
+                }
+
+                vue.list_data_option = data.data.list_data_option;
+
+
+                vue.list_count = parseInt(data.data.list_count);
+                vue.list_limit = parseInt(data.data.list_limit);
+                vue.list_data = filter(data.data.list_data);
+                vue.loading = false;
+
+
+                if (location.search != '') {
+                    var tmp_filter = jQuery.deparam(location.search.split("?")[1]).filter;
+                    if (!tmp_filter) {
+                        tmp_filter = {};
+                    }
+                    vue.filter = tmp_filter;
+
+                    for (var i in vue.filter_header) {
+                        vue.filter_select[i] = vue.filter[vue.filter_header[i]];
+                    }
+                }
+
+                setTimeout(function () {
+                    vue.$forceUpdate()
+                }, 1000)
+            }
+        });
+    }
+
+    changePage(1);
+
+
+</script>
+</html>
