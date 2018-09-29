@@ -19,6 +19,9 @@
       <path value="$PROJECT_DIR$/chessemark1/vendor/psr/log" />
       <path value="$PROJECT_DIR$/chessemark1/vendor/psr/http-message" />
       <path value="$PROJECT_DIR$/chessemark1/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/chessemark1/vendor/phpqrcode/cache" />
+      <path value="$PROJECT_DIR$/chessemark1/vendor/phpqrcode/bindings" />
+      <path value="$PROJECT_DIR$/chessemark1/vendor/phpqrcode/tools" />
     </include_path>
   </component>
 </project>

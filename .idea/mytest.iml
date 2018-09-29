@@ -11,6 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/overtrue/socialite" />
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/overtrue/wechat" />
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/paragonie/random_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/phpqrcode/bindings" />
+      <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/phpqrcode/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/phpqrcode/tools" />
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/pimple/pimple" />
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/psr/container" />
       <excludeFolder url="file://$MODULE_DIR$/chessemark1/vendor/psr/http-message" />

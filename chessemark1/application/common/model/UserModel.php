@@ -45,7 +45,7 @@ class UserModel extends BaseModel
     }
 
 
-    //插入数据
+    //插入数据，
     public function insertData($data)
     {
         $time = date('Y-m-d H:i:s', $data['expire_in']);
